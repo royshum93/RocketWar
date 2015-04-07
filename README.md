@@ -3,30 +3,30 @@
 CSCI 4140 Project - Rocket War
 
 Group Name: RS Studio
-Features
-2D Physics: jumping of character, locus of rocket, etc.
-Multiplayer
-Network connection, server for hosting the game
-Different weapons
-Kill bonus: acceleration, higher damage, etc.
-Scores
+# Features
+-	2D Physics: jumping of character, locus of rocket, etc.
+-	Multiplayer
+-	Network connection, server for hosting the game
+-	Different weapons
+-	Kill bonus: acceleration, higher damage, etc.
+-	Scores
 
-Programming challenges/libraries involved
-Real-time actions with acceptable delay (direct websocket connection)
-Handling multiplayer, synchronization
-Object movements, collision detections
-Game framework: Phaser
+# Programming challenges/libraries involved
+-	Real-time actions with acceptable delay (direct websocket connection)
+-	Handling multiplayer, synchronization
+-	Object movements, collision detections
+-	Game framework: Phaser
 
-Deployment scenarios
-More than one player
-Require more than one computer (browser)
-Server required (not sure how to do now)
-Use public server
+# Deployment scenarios
+-	More than one player
+-	Require more than one computer (browser)
+-	Server required (not sure how to do now)
+-	Use public server
 
-System design
+# System design
 
 
-Milestones
+# Milestones
 Milestone 1: Basic Map and Character setup (10, 2 players)
 	-	Basic Scene for showing the characters 
 	-	Own character is able to control freely
@@ -48,9 +48,9 @@ Milestone 4: Extra in-game items (5)
 	-	extra in-game items for players to pick up and enrich their characters
 	-	bonus effect on killing other players
 
-Schedule
+# Schedule
 
 
-References (our own use)
-https://www.youtube.com/watch?v=6UaACK2wglQ
-https://github.com/cherrry/N-Mario
+# References (our own use)
+-	https://www.youtube.com/watch?v=6UaACK2wglQ
+-	https://github.com/cherrry/N-Mario
