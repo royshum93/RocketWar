@@ -14,7 +14,7 @@ app.use('/',express.static(__dirname + '/public'));
 
 //Routing
 app.get('/', function (req, res) {
-   res.sendfile(path.join(__dirname + '/public/test.html'));
+   res.sendfile(path.join(__dirname + '/public/rocketwar.html'));
 });
 
 

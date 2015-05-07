@@ -8,7 +8,7 @@ window.onload = function (){
     oldOnload();
     socket.emit("register", function (id){
         
-        alert('player id = ' + id);
+        alert('player id ok');
         
     });
 };
