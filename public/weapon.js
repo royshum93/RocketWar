@@ -11,6 +11,8 @@ var Bullet = function (game, key) {
 
     this.tracking = false;
     this.scaleSpeed = 0;
+
+    this.enableBody = true;
 };
 
 Bullet.prototype = Object.create(Phaser.Sprite.prototype);
@@ -69,9 +71,9 @@ Weapon.Rockets.prototype.fire = function (source) {
     var y = source.y + 10;
 
     if(player.faceDirection == "left")
-        this.getFirstExists(false).fire(x, y, -135, this.bulletSpeed, -500, 700);
+        this.getFirstExists(false).fire(x, y, -170, this.bulletSpeed, -500, 300);
     else if(player.faceDirection == "right")
-        this.getFirstExists(false).fire(x, y, -45, this.bulletSpeed, 500, 700);
+        this.getFirstExists(false).fire(x, y, -10, this.bulletSpeed, 500, 300);
 
     this.nextFire = this.game.time.time + this.fireRate;
 };
