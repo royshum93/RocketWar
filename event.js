@@ -9,25 +9,32 @@ exports.startSocket = function(server){
         
         socket.on("register",function(){
             var playerID = playerInfo.add(socket.id);
-            console.log('new player connected, socket id:'+ socket.id+', sess id:'+ playerID);
-            socket.emit(playerID);
-            //A client has dc
+            console.log('new player connected, player id:'+ playerID);
+            socket.emit("register", playerID);
             
+            //A client has dc
             socket.on('disconnect', function(){
                 playerInfo.clr(socket.id);
-		        console.log('user disconnected, socket id:'+ socket.id+', sess id:'+ playerID);
+		        console.log('user disconnected, player id:'+ playerID);
             });
       
+            //relay only, position info from other players
             socket.on('sync', function(data){
                 socket.broadcast.emit("sync",data);
             });
       
+            //relay only, position info from other players
             socket.on('ctrl', function(data) {
                 socket.broadcast.emit("ctrl",data);
             });
             
+            //save score, game status for individual players, will not broadcast till endgame
+            socket.on('info', function(data){
+                playerInfo.putInfo(socket.id, data);
+            });
             
             socket.on('gg', function () {
+                socket.broadcast.emit("gg", playerInfo.get());
                 playerInfo.end();
             });
             
@@ -50,17 +57,13 @@ var playerInfo = function(){
                 return 0;
             } else {
                 playerID += 1;
-                clients.push({player: playerID, socket: socket_id});
+                clients.push({player: playerID, socket: socket_id, info: {}});
                 return playerID;
             }
         },
         
-        get: function (socket_id) {
-            for (var i=0; i<clients.length; i++) {
-                if (clients[i].socket === socket_id) {
-                    return clients[i].player;
-                }
-            }
+        get: function () {
+            return clients;
         },
         
         clr: function (socket_id) {
@@ -74,8 +77,14 @@ var playerInfo = function(){
                    break;
                 }
             }
-            
-            console.log('clr: ' + JSON.stringify(clients));
+        },
+        
+        putInfo: function (socket_id, data) {
+            for (var i=0; i<clients.length; i++) {
+                if (clients[i].socket === socket_id) {
+                    clients[i].info = data;
+                }
+            }
         },
         
         end: function () {
