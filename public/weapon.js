@@ -41,6 +41,10 @@ Bullet.prototype.update = function () {
         this.scale.x += this.scaleSpeed;
         this.scale.y += this.scaleSpeed;
     }
+    
+    if(this.body.velocity.x == 0 && this.body.velocity.y == 0) {
+        this.kill();
+    }
 };
 
 var Weapon = {};
@@ -70,10 +74,19 @@ Weapon.Rockets.prototype.fire = function (source) {
     var x = source.x + 10;
     var y = source.y + 10;
 
-    if(player.faceDirection == "left")
-        this.getFirstExists(false).fire(x, y, -170, this.bulletSpeed, -500, 300);
-    else if(player.faceDirection == "right")
-        this.getFirstExists(false).fire(x, y, -10, this.bulletSpeed, 500, 300);
+    // control rocket directions
+    if(rocketLRDirection == "none" && rocketDirection == "up" && player.faceDirection == "left")
+        this.getFirstExists(false).fire(x, y, -90, this.bulletSpeed, -500, 300);    // up
+    else if(rocketLRDirection == "none" && rocketDirection == "up" && player.faceDirection == "right")
+        this.getFirstExists(false).fire(x, y, -90, this.bulletSpeed, 500, 300);     // up
+    else if(rocketLRDirection == "none" && rocketDirection == "down" && player.faceDirection == "left")
+        this.getFirstExists(false).fire(x, y, 90, this.bulletSpeed, -500, 300);     // down
+    else if(rocketLRDirection == "none" && rocketDirection == "down" && player.faceDirection == "right")
+        this.getFirstExists(false).fire(x, y, 90, this.bulletSpeed, 500, 300);      // down
+    else if(player.faceDirection == "left" && rocketDirection == "none")
+        this.getFirstExists(false).fire(x, y, -170, this.bulletSpeed, -500, 300);   // left
+    else if(player.faceDirection == "right" && rocketDirection == "none")
+        this.getFirstExists(false).fire(x, y, -10, this.bulletSpeed, 500, 300);     // right
 
     this.nextFire = this.game.time.time + this.fireRate;
 };
