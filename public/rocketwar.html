@@ -28,6 +28,11 @@ function preload() {
     game.load.image('bullet10', 'assets/bullet10.png');
     game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
     game.load.spritesheet('dude2', 'assets/dude2.png', 32, 48);
+    game.load.audio('end', 'assets/end.mp3');
+    game.load.audio('fire', 'assets/fire.mp3');
+    game.load.audio('jump', 'assets/jump.mp3');
+    game.load.audio('start', 'assets/start.mp3');
+    game.load.audio('explosion', 'assets/explosion.mp3');
 }
 
 var player;
@@ -37,6 +42,8 @@ var platforms;
 var cursors;
 var p1Weapons = [];
 var p2Weapons = [];
+var p1CurrentWeapon = 0;
+var p2CurrentWeapon = 0;
 
 var rocketDirection;
 var rocketLRDirection;
@@ -47,7 +54,8 @@ var scoreText2;
 
 var timer;
 var timerText;
-var gameStatus = "ended";
+var gameSignal = "start";
+var gameStatus = "waiting";
 var gameMessage;
 
 function create() {
@@ -110,6 +118,7 @@ function create() {
     var p1xPostion = game.rnd.integerInRange(12, 858);
     var p2xPostion = game.rnd.integerInRange(12, 858);
 
+    // add players
     player = game.add.sprite(p1xPostion, game.world.height - 550, 'dude');
     otherPlayer = game.add.sprite(p2xPostion, game.world.height - 550, 'dude2');
 
@@ -125,6 +134,15 @@ function create() {
     player.body.collideWorldBounds = true;
     otherPlayer.body.collideWorldBounds = true;
 
+    //  Our controls.
+    cursors = game.input.keyboard.createCursorKeys();
+
+    // Weapon array
+    p1Weapons.push(new Weapon.Rockets(this.game));
+    p1Weapons.push(new Weapon.RocketsX3(this.game));
+    p2Weapons.push(new Weapon.Rockets(this.game));
+    p2Weapons.push(new Weapon.RocketsX3(this.game));
+
     //  Our two animations, walking left and right.
     player.animations.add('left', [0, 1, 2, 3], 10, true);
     player.animations.add('right', [5, 6, 7, 8], 10, true);
@@ -132,30 +150,32 @@ function create() {
 
     otherPlayer.animations.add('left', [0, 1, 2, 3], 10, true);
     otherPlayer.animations.add('right', [5, 6, 7, 8], 10, true);
+    otherPlayer.faceDirection = "left";
 
     //  The score
     scoreText = game.add.text(32, 32, 'Player 1 Score: 0', { fontSize: '18px', fill: '#FFF' });
     scoreText2 = game.add.text(700, 32, 'Player 2 Score: 0', { fontSize: '18px', fill: '#FFF' });
 
-    //  Our controls.
-    cursors = game.input.keyboard.createCursorKeys();
-
-    // p1Weapons
-    p1Weapons.push(new Weapon.Rockets(this.game));
-    p2Weapons.push(new Weapon.Rockets(this.game));
-
-    // timer
+	// timer
     timerText = game.add.text(408, 28, '03:00', { fontSize: '32px', fill: '#FFF', align: 'center'});
-    
     timer = game.time.create();
-    // Create a delayed event 3m from now
-    timerEvent = timer.add(Phaser.Timer.MINUTE * 3, endTimer, this);        
-    // Start the timer
-    timer.start();
-    gameStatus = "playing";
+
+    gameMessage = game.add.text(264, 245, "", { fontSize: '32px', fill: '#FFF', align: 'center'});
 }
 
 function update() {
+	// game signals
+	if(gameStatus == "waiting" && gameSignal == "start") {
+		game.sound.play('start');
+		startGame();
+	}
+
+	// when game ended and press space
+    if(gameStatus == "ended" && this.input.keyboard.isDown(Phaser.Keyboard.ENTER)) {
+    	game.sound.play('start');
+    	restartGame();
+    }
+
     //  Collide the player and the stars with the platforms
     game.physics.arcade.collide(player, platforms);
     game.physics.arcade.collide(otherPlayer, platforms);
@@ -164,24 +184,18 @@ function update() {
     //  Checks to see if the player overlaps with any of the rocket
     game.physics.arcade.overlap(otherPlayer, p1Weapons, weaponCollideOtherPlayer, null, this);
 
+    upgradeWeapon();
+
     //  Reset the players velocity (movement)
     player.body.velocity.x = 0;
 
-    if (cursors.left.isDown && gameStatus != "ended") {
+    if (cursors.left.isDown && gameStatus == "playing") {
         //  Move to the left
-        player.body.velocity.x = -150;
-
-        player.animations.play('left');
-
-        player.faceDirection = "left";
+        move(player, "left");
     }
-    else if (cursors.right.isDown && gameStatus != "ended") {
+    else if (cursors.right.isDown && gameStatus == "playing") {
         // Move to the right
-        player.body.velocity.x = 150;
-
-        player.animations.play('right');
-
-        player.faceDirection = "right";
+        move(player, "right");
     }
     else {
         // Stand still
@@ -207,26 +221,110 @@ function update() {
     }
     
     //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down  && gameStatus != "ended") {
+    if (cursors.up.isDown && player.body.touching.down  && gameStatus == "playing") {
         player.body.velocity.y = -350;
+        game.sound.play('jump');
     }
 
     // fire
-    if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)  && gameStatus != "ended") {
-        if(player.alive)
-        	p1Weapons[0].fire(player);
+    if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)  && gameStatus == "playing") {
+        if(player.alive) {
+        	p1Weapons[p1CurrentWeapon].fire(player);
+        }
     }
 
    	if (timer.running) {
         timerText.setText(formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)));
     }
     else {
-    	gameMessage = game.add.text(264, 245, "Press Space to Restart!", { fontSize: '32px', fill: '#FFF', align: 'center'});
+    	if(gameStatus == "waiting")
+    		gameMessage.setText("      Waiting to Start...");
+    	else if(gameStatus == "ended") {
+    		var winnerMsg;
+    		if(score > score2)
+    			winnerMsg = "Player 1 Won!";
+    		else if(score < score2)
+    			winnerMsg = "Player 2 Won!";
+    		else
+    			winnerMsg = "Draw Game!"
+    		gameMessage.setText(winnerMsg + "\n" + "Press Enter to Restart!");
+    	}
     }
+}
 
-    // when game ended and press space
-    if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)  && gameStatus == "ended")
-    	restartGame();
+function startGame() {
+	gameMessage.setText("");
+    // Create a delayed event 3m from now
+    timerEvent = timer.add(Phaser.Timer.MINUTE * 3, endGame, this);        
+    // Start the timer
+    timer.start();
+    gameStatus = "playing";
+}
+
+function endGame() {
+	timer.stop();
+	gameStatus = "ended";
+	game.sound.play('end');
+}
+
+function restartGame() {
+	// gameMessage.setText("");
+	// // reset scores
+	// score = 0;
+	// score2 = 0;
+
+	// // reset timer
+	// timer.destroy();
+	// timer = game.time.create();
+	// timerEvent = timer.add(Phaser.Timer.MINUTE * 0.1, endGame, this);        
+ 	// timer.start();
+
+	// gameStatus = "playing";
+
+	location.reload();
+}
+
+function move(p, dir) {
+	if(dir == "left") {
+		if(p === player) {
+			if(score >= 15)
+				p.body.velocity.x = -450;
+			else if(score >= 5)
+				p.body.velocity.x = -300;
+			else
+				p.body.velocity.x = -150;
+		}
+		else if(p === otherPlayer) {
+			if(score2 >= 15)
+				p.body.velocity.x = -450;
+			else if(score2 >= 5)
+				p.body.velocity.x = -300;
+			else
+				p.body.velocity.x = -150;
+		}
+		p.animations.play('left');
+		p.faceDirection = "left";
+	}
+	else if(dir == "right") {
+		if(p === player) {
+			if(score >= 15)
+				p.body.velocity.x = 450;
+			else if(score >= 5)
+				p.body.velocity.x = 300;
+			else
+				p.body.velocity.x = 150;
+		}
+		else if(p === otherPlayer) {
+			if(score2 >= 15)
+				p.body.velocity.x = 450;
+			else if(score2 >= 5)
+				p.body.velocity.x = 300;
+			else
+				p.body.velocity.x = 150;
+		}
+        p.animations.play('right');
+        p.faceDirection = "right";
+	}
 }
 
 function formatTime(s) {
@@ -236,12 +334,9 @@ function formatTime(s) {
     return minutes.substr(-2) + ":" + seconds.substr(-2); 
 }
 
-function endTimer() {
-	timer.stop();
-	gameStatus = "ended";
-}
-
 function weaponCollideOtherPlayer (otherPlayer, p1Weapons) {
+	game.sound.play('explosion');
+
     // Removes the rocket from the screen
     p1Weapons.kill();
     otherPlayer.kill();
@@ -255,6 +350,8 @@ function weaponCollideOtherPlayer (otherPlayer, p1Weapons) {
 }
 
 function weaponCollidePlayer (player, p1Weapons) {
+	game.sound.play('explosion');
+
     // Removes the rocket from the screen
     p1Weapons.kill();
     player.kill();
@@ -277,8 +374,18 @@ function p2Reborn() {
 	otherPlayer.reset(randomXPosition, game.world.height - 550);
 }
 
-function restartGame() {
-	// not yet done
+function upgradeWeapon() {
+	// player 1
+	if(score >= 20)
+		p1CurrentWeapon = 1;
+	else if(score >= 10)
+		p1Weapons[p1CurrentWeapon].setAll('scaleSpeed', 0.02);
+
+	// player 2
+	if(score2 >= 20)
+		p2CurrentWeapon = 1;
+	else if(score2 >= 10)
+		p2Weapons[p2CurrentWeapon].setAll('scaleSpeed', 0.02);
 }
 
 </script>
