@@ -57,7 +57,7 @@ var scoreText2;
 
 var timer;
 var timerText;
-var gameSignal = "start";
+var gameSignal = "waiting";
 var gameStatus = "waiting";
 var gameMessage;
 
@@ -236,7 +236,7 @@ function update() {
         }
     }
 
-   	if (timer.running) {
+   	if (timer.running && gameStatus != "ended") {
         timerText.setText(formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)));
     }
     else {

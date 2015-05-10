@@ -11,11 +11,20 @@ exports.startSocket = function(server){
             var playerID = playerInfo.add(socket.id);
             console.log('new player connected, player id:'+ playerID);
             socket.emit("register", playerID);
+            if (playerInfo.start()){
+                console.log('start game');
+                io.sockets.emit('info', { action : 'start'});
+            }
             
-            //A client has dc
+            //A client has dc, gg
             socket.on('disconnect', function(){
-                playerInfo.clr(socket.id);
-		        console.log('user disconnected, player id:'+ playerID);
+                if (playerInfo.start()){
+                    io.sockets.emit('gg');
+                    playerInfo.end();
+                }else {
+                    playerInfo.clr(socket.id);
+                }
+		        console.log('user disconnected, player id:'+ playerID + 'count ' + playerInfo.count());
             });
       
             //relay only, position info from other players
@@ -31,6 +40,7 @@ exports.startSocket = function(server){
             //save score, game status for individual players, will not broadcast till endgame
             socket.on('info', function(data){
                 playerInfo.putInfo(socket.id, data);
+                socket.broadcast.emit('info', data);
             });
             
             socket.on('gg', function () {
@@ -90,6 +100,14 @@ var playerInfo = function(){
         end: function () {
             clients = [];
             playerID = 0;
+        },
+        
+        start: function () {
+            return (clients.length === config.max_player_num);
+        },
+        
+        count: function (){
+            return clients.length;
         }
     };
     
