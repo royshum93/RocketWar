@@ -11,10 +11,29 @@ exports.startSocket = function(server){
             var playerID = playerInfo.add(socket.id);
             console.log('new player connected, player id:'+ playerID);
             socket.emit("register", playerID);
+            
+            
+            //start
             if (playerInfo.start()){
-                console.log('start game');
-                io.sockets.emit('info', { action : 'start'});
+                var start_data = {},
+                    clientList = playerInfo.get(),
+                    i;
+                    
+                start_data.action = 'start';
+                start_data.coord = [];
+                
+                for(i = 0 ; i < clientList.length; i += 1) {
+                    var playerCoord = {};
+                    playerCoord.id = i+1;
+                    playerCoord.startX = Math.floor((Math.random() * 846) + 12);
+                    start_data.coord.push(playerCoord);
+                }
+                
+                io.sockets.emit('info', start_data);
+                console.log('start game, ' + JSON.stringify(start_data));
             }
+            
+            
             
             //A client has dc, gg
             socket.on('disconnect', function(){

@@ -70,24 +70,24 @@ Weapon.Rockets = function (game) {
 Weapon.Rockets.prototype = Object.create(Phaser.Group.prototype);
 Weapon.Rockets.prototype.constructor = Weapon.Rockets;
 
-Weapon.Rockets.prototype.fire = function (source) {
+Weapon.Rockets.prototype.fire = function (source,rocketLRDirection,rocketDirection,faceDirection) {
     if (this.game.time.time < this.nextFire) { return; }
 
     var x = source.x + 10;
     var y = source.y + 10;
 
     // control rocket directions
-    if(rocketLRDirection == "none" && rocketDirection == "up" && player.faceDirection == "left")
+    if(rocketLRDirection == "none" && rocketDirection == "up" && faceDirection == "left")
         this.getFirstExists(false).fire(x, y, -90, this.bulletSpeed, -500, 300);    // up
-    else if(rocketLRDirection == "none" && rocketDirection == "up" && player.faceDirection == "right")
+    else if(rocketLRDirection == "none" && rocketDirection == "up" && faceDirection == "right")
         this.getFirstExists(false).fire(x, y, -90, this.bulletSpeed, 500, 300);     // up
-    else if(rocketLRDirection == "none" && rocketDirection == "down" && player.faceDirection == "left")
+    else if(rocketLRDirection == "none" && rocketDirection == "down" && faceDirection == "left")
         this.getFirstExists(false).fire(x, y, 90, this.bulletSpeed, -500, 300);     // down
-    else if(rocketLRDirection == "none" && rocketDirection == "down" && player.faceDirection == "right")
+    else if(rocketLRDirection == "none" && rocketDirection == "down" && faceDirection == "right")
         this.getFirstExists(false).fire(x, y, 90, this.bulletSpeed, 500, 300);      // down
-    else if(player.faceDirection == "left" && rocketDirection == "none")
+    else if(faceDirection == "left" && rocketDirection == "none")
         this.getFirstExists(false).fire(x, y, -170, this.bulletSpeed, -500, 300);   // left
-    else if(player.faceDirection == "right" && rocketDirection == "none")
+    else if(faceDirection == "right" && rocketDirection == "none")
         this.getFirstExists(false).fire(x, y, -10, this.bulletSpeed, 500, 300);     // right
 
     this.nextFire = this.game.time.time + this.fireRate;
@@ -112,19 +112,19 @@ Weapon.RocketsX3 = function (game) {
 Weapon.RocketsX3.prototype = Object.create(Phaser.Group.prototype);
 Weapon.RocketsX3.prototype.constructor = Weapon.RocketsX3;
 
-Weapon.RocketsX3.prototype.fire = function (source) {
+Weapon.RocketsX3.prototype.fire = function (source,rocketLRDirection,rocketDirection,faceDirection) {
     if (this.game.time.time < this.nextFire) { return; }
 
     var x = source.x + 10;
     var y = source.y + 10;
 
     // control rocket directions
-    if(player.faceDirection == "left") {
+    if(faceDirection == "left") {
         this.getFirstExists(false).fire(x, y, -90, this.bulletSpeed, -500, 300);    // up
         this.getFirstExists(false).fire(x, y, -170, this.bulletSpeed, -500, 300);   // left
         this.getFirstExists(false).fire(x, y, 90, this.bulletSpeed, -500, 300);     // down
     }
-    else if(player.faceDirection == "right") {
+    else if(faceDirection == "right") {
         this.getFirstExists(false).fire(x, y, -90, this.bulletSpeed, 500, 300);     // up
         this.getFirstExists(false).fire(x, y, -10, this.bulletSpeed, 500, 300);     // right
         this.getFirstExists(false).fire(x, y, 90, this.bulletSpeed, 500, 300);      // down
