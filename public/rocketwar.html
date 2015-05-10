@@ -185,6 +185,7 @@ function update() {
     game.physics.arcade.collide(otherPlayer, platforms);
     game.physics.arcade.collide(platforms, p1Weapons);
     game.physics.arcade.collide(platforms, p2Weapons);
+    game.physics.arcade.collide(p1Weapons, p2Weapons, weaponColideWeapon);
 
     //  Checks to see if the player overlaps with any of the rocket
     game.physics.arcade.overlap(otherPlayer, p1Weapons, weaponCollideOtherPlayer, null, this);
@@ -366,7 +367,7 @@ function weaponCollideOtherPlayer (otherPlayer, p1Weapons) {
 
     score += 1;
     scoreText.text = 'Your Score: ' + score;
-
+    window.socket.emit('info', {action: 'score' , data: score});
 }
 
 function weaponCollidePlayer (player, p2Weapons) {
@@ -379,8 +380,14 @@ function weaponCollidePlayer (player, p2Weapons) {
     var p1RebornTimer = game.time.events.add(Phaser.Timer.SECOND * 1, p1Reborn, this);
 
     //  Add and update the score
-    score2 += 1;
+    // duplication of adding score from socket
+    //score2 += 1;
     scoreText2.text = "Other\'s Score: " + score2;
+}
+
+function weaponColideWeapon(p1Weapons, p2Weapons) {
+    p1Weapons.kill();
+    p2Weapons.kill();
 }
 
 function p1Reborn(randomXPosition) {
@@ -409,14 +416,18 @@ function p2Reborn(randomXPosition) {
 
 function upgradeWeapon() {
 	// player 1
-	if(score >= 20)
-		p1CurrentWeapon = 1;
+	if(score >= 20) {
+	    p1CurrentWeapon = 1;
+        p1Weapons[p1CurrentWeapon].setAll('scaleSpeed', 0);
+	}
 	else if(score >= 10)
 		p1Weapons[p1CurrentWeapon].setAll('scaleSpeed', 0.02);
 
 	// player 2
-	if(score2 >= 20)
+	if(score2 >= 20) {
 		p2CurrentWeapon = 1;
+	    p2Weapons[p2CurrentWeapon].setAll('scaleSpeed', 0);
+	}
 	else if(score2 >= 10)
 		p2Weapons[p2CurrentWeapon].setAll('scaleSpeed', 0.02);
 }

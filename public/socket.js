@@ -62,6 +62,7 @@ window.onload = function (){
         }else if (data.action === 'score'){
             //add otherplayer score
             score2 = data.data;
+            scoreText2.text = "Other\'s Score: " + score2;
         }
         
     });

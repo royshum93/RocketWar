@@ -58,7 +58,6 @@ exports.startSocket = function(server){
             
             //save score, game status for individual players, will not broadcast till endgame
             socket.on('info', function(data){
-                playerInfo.putInfo(socket.id, data);
                 socket.broadcast.emit('info', data);
             });
             
