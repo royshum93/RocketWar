@@ -10,20 +10,25 @@ Group Name: RS Studio
 -	Different weapons
 -	Kill bonus: acceleration, higher damage, etc.
 -	Scores
+-	Spectate Mode (New!)
 
 # Programming challenges/libraries involved
 -	Real-time actions with acceptable delay (direct websocket connection)
 -	Handling multiplayer, synchronization
 -	Object movements, collision detections
 -	Game framework: Phaser
+-	Network framework: Socket.io
 
 # Deployment scenarios
--	More than one player
+-	2 players game
 -	Require more than one computer (browser)
--	Server required (not sure how to do now)
--	Use public server
+-	Server at one of the clients
 
-# System design
+# Run the Project
+1. git clone https://github.com/royshum93/RocketWar.git
+2. cd RocketWar
+3. npm install
+4. node server.js
 
 
 # Milestones
@@ -39,16 +44,10 @@ Milestone 2: Scene enrichments (5)
 	-	Player stats manipulation and display
 	-	Scene Transition: Game start and end
 
-Milestone 3: Game Lobby and rooms (30%)
-	-	Display game rooms, waiting player
-	-	Players in the same room can start their game
-
 
 Milestone 4: Extra in-game items (5)
 	-	extra in-game items for players to pick up and enrich their characters
 	-	bonus effect on killing other players
-
-# Schedule
 
 
 # References (our own use)
