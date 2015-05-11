@@ -37,7 +37,7 @@ exports.startSocket = function(server){
             
             //A client has dc, gg
             socket.on('disconnect', function(){
-                if (playerInfo.start()){
+                if (playerInfo.isStart() && playerInfo.exist(socket.id)){
                     io.sockets.emit('gg');
                     playerInfo.end();
                 }else {
@@ -111,12 +111,13 @@ var playerInfo = function(){
             playerID--;
         },
         
-        putInfo: function (socket_id, data) {
+        exist: function (socket_id) {
             for (var i=0; i<clients.length; i++) {
                 if (clients[i].socket === socket_id) {
-                    clients[i].info = data;
+                    return true;
                 }
             }
+            return false;
         },
         
         end: function () {
@@ -135,6 +136,10 @@ var playerInfo = function(){
         
         count: function (){
             return clients.length;
+        },
+        
+        isStart: function(){
+            return started;
         }
     };
     

@@ -29,6 +29,7 @@ Group Name: RS Studio
 2. cd RocketWar
 3. npm install
 4. node server.js
+5. if there is error, try modify config.json ("PORT": 80) to other ports for listening
 
 
 # Milestones
