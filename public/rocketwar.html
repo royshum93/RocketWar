@@ -157,9 +157,13 @@ function create() {
     otherPlayer.faceDirection = "left";
 
     //  The score
-    scoreText = game.add.text(32, 32, 'Your Score: 0', { fontSize: '18px', fill: '#FFF' });
-    scoreText2 = game.add.text(700, 32, "Other\'s Score: 0", { fontSize: '18px', fill: '#FFF' });
-
+    if (playerid === 0){
+        scoreText = game.add.text(32, 32, 'Player 1\'s Score: 0', { fontSize: '18px', fill: '#FFF' });
+        scoreText2 = game.add.text(700, 32, "Player 2\'s Score: 0", { fontSize: '18px', fill: '#FFF' }); 
+    }else {
+        scoreText = game.add.text(32, 32, 'Your Score: 0', { fontSize: '18px', fill: '#FFF' });
+        scoreText2 = game.add.text(700, 32, "Other\'s Score: 0", { fontSize: '18px', fill: '#FFF' });
+    }
 	// timer
     timerText = game.add.text(408, 28, '03:00', { fontSize: '32px', fill: '#FFF', align: 'center'});
     timer = game.time.create();
@@ -202,12 +206,12 @@ function update() {
         window.socket.emit("sync", {id: playerid, x: player.x, y: player.y});
     }
     
-    if (cursors.left.isDown && gameStatus == "playing") {
+    if (cursors.left.isDown && gameStatus == "playing" && (playerid !== 0)) {
         //  Move to the left
         move(player, "left");
         window.socket.emit('ctrl', {id: playerid, action: 'move', data: "left" });
     }
-    else if (cursors.right.isDown && gameStatus == "playing") {
+    else if (cursors.right.isDown && gameStatus == "playing"  && (playerid !== 0)) {
         // Move to the right
         move(player, "right");
         window.socket.emit('ctrl', {id: playerid, action: 'move', data: "right" });
@@ -236,14 +240,14 @@ function update() {
     }
     
     //  Allow the player to jump if they are touching the ground.
-    if (cursors.up.isDown && player.body.touching.down  && gameStatus == "playing") {
+    if (cursors.up.isDown && player.body.touching.down  && gameStatus == "playing"  && (playerid !== 0)) {
         player.body.velocity.y = -350;
         game.sound.play('jump');
         window.socket.emit('ctrl', {id: playerid, action: 'move', data: "jump" });
     }
 
     // fire
-    if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)  && gameStatus == "playing") {
+    if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)  && gameStatus == "playing"  && (playerid !== 0)) {
         if(player.alive) {
         	p1Weapons[p1CurrentWeapon].fire(player,rocketLRDirection,rocketDirection,player.faceDirection);
         	window.socket.emit('ctrl', {id: playerid, action: 'fire', data: {W: p1CurrentWeapon, LR: rocketLRDirection, Dir: rocketDirection, faceD: player.faceDirection} });
@@ -258,12 +262,23 @@ function update() {
     		gameMessage.setText("      Waiting to Start...");
     	else if(gameStatus == "ended") {
     		var winnerMsg;
-    		if(score > score2)
-    			winnerMsg = " You Win!";
-    		else if(score < score2)
-    			winnerMsg = "You Lose!";
-    		else
-    			winnerMsg = "Draw Game!"
+    		
+    		if (playerid !== 0){
+    	    	if(score > score2)
+    		    	winnerMsg = " You Win!";
+    		    else if(score < score2)
+        			winnerMsg = "You Lose!";
+        		else
+    	    		winnerMsg = "Draw Game!";
+    		}else{
+    		    if(score > score2)
+    		    	winnerMsg = "Player 1 Win!";
+    		    else if(score < score2)
+        			winnerMsg = "Player 2 Win!";
+        		else
+    	    		winnerMsg = "Draw Game!";
+    		}
+    		
     		gameMessage.setText(winnerMsg + "\n" + "Press Enter to Restart!");
     	}
     }

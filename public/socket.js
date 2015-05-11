@@ -20,24 +20,36 @@ window.onload = function (){
     
     //position info from other players
     socket.on("sync", function (data){
-        //if ((playerid > 0) || (data.id === 2)) {
+        if ((playerid > 0) || (data.id === 2)) {
 		    if (otherPlayer !== undefined) {
 			    otherPlayer.reset(data.x, data.y);
 		    }
-        //}else {
-          //  if (player !== undefined) {
-		//	    player.reset(data.x, data.y);
-		//    }
-        //}
+        }else {
+            if (player !== undefined) {
+			    player.reset(data.x, data.y);
+		    }
+        }
     });
     
     
     //other control info, jump, collisions
     socket.on("ctrl", function (data){
-        if (data.action === "move") {
-            move(otherPlayer, data.data);
-        } else if (data.action === "fire") {
-            p2Weapons[data.data.W].fire(otherPlayer,data.data.LR,data.data.Dir,data.data.faceD);
+        if ((playerid > 0) || (data.id === 2)) {
+            if (otherPlayer !== undefined) {
+                if (data.action === "move") {
+                    move(otherPlayer, data.data);
+                } else if (data.action === "fire") {
+                    p2Weapons[data.data.W].fire(otherPlayer,data.data.LR,data.data.Dir,data.data.faceD);
+                }
+            }
+        }else {
+            if (player !== undefined) {
+			    if (data.action === "move") {
+                    move(player, data.data);
+                } else if (data.action === "fire") {
+                    p1Weapons[data.data.W].fire(player,data.data.LR,data.data.Dir,data.data.faceD);
+                }
+		    }
         }
     });
     
@@ -71,8 +83,16 @@ window.onload = function (){
             }
         }else if (data.action === 'score'){
             //add otherplayer score
-            score2 = data.data;
-            scoreText2.text = "Other\'s Score: " + score2;
+            if ((playerid > 0) || (data.id === 2)) {
+                score2 = data.data;
+                if (playerid === 0)
+                    scoreText2.text = "Player 2\'s Score: " + score2;
+                else 
+                    scoreText2.text = "Other\'s Score: " + score2;
+            }else {
+                score = data.data;
+                scoreText.text = "Player 1\'s Score: " + score;
+            }
         }
         
     });

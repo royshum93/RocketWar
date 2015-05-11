@@ -54,12 +54,12 @@ exports.startSocket = function(server){
             //relay only, position info from other players
             socket.on('ctrl', function(data) {
                 socket.broadcast.emit("ctrl",data);
-                console.log('ctrl ' + JSON.stringify(data));
             });
             
             //save score, game status for individual players, will not broadcast till endgame
             socket.on('info', function(data){
                 socket.broadcast.emit('info', data);
+                console.log('info :' + JSON.stringify(data));
             });
             
             socket.on('gg', function () {
@@ -107,6 +107,8 @@ var playerInfo = function(){
                    break;
                 }
             }
+            
+            playerID--;
         },
         
         putInfo: function (socket_id, data) {
