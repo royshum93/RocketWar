@@ -54,6 +54,7 @@ exports.startSocket = function(server){
             //relay only, position info from other players
             socket.on('ctrl', function(data) {
                 socket.broadcast.emit("ctrl",data);
+                console.log('ctrl ' + JSON.stringify(data));
             });
             
             //save score, game status for individual players, will not broadcast till endgame
@@ -75,7 +76,8 @@ exports.startSocket = function(server){
 
 var playerInfo = function(){
     var clients =[],
-        playerID = 0;
+        playerID = 0,
+        started = false;
         
     
     return {
@@ -118,10 +120,15 @@ var playerInfo = function(){
         end: function () {
             clients = [];
             playerID = 0;
+            started = false;
         },
         
         start: function () {
-            return (clients.length === config.max_player_num);
+            if ((!started) && (clients.length === config.max_player_num)){
+                started = true;
+                return true;
+            }
+                return false;
         },
         
         count: function (){

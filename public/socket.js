@@ -2,7 +2,7 @@
 
 window.socket = io.connect();
 var socket = window.socket;
-var playerid;
+var playerid = -1;
 
 var oldOnload = window.onload || function () {};
 window.onload = function (){
@@ -13,14 +13,24 @@ window.onload = function (){
     //register info of own player (Will not receive other player register event)
     socket.on("register", function (id){
         playerid = id;
+        if (playerid === 0){
+            gameSignal = 'start';
+        }
     });
     
     //position info from other players
     socket.on("sync", function (data){
-		if (otherPlayer !== undefined) {
-			otherPlayer.reset(data.x, data.y);
-		}
+        //if ((playerid > 0) || (data.id === 2)) {
+		    if (otherPlayer !== undefined) {
+			    otherPlayer.reset(data.x, data.y);
+		    }
+        //}else {
+          //  if (player !== undefined) {
+		//	    player.reset(data.x, data.y);
+		//    }
+        //}
     });
+    
     
     //other control info, jump, collisions
     socket.on("ctrl", function (data){

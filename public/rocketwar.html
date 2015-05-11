@@ -199,18 +199,18 @@ function update() {
     
     //sync other player position
     if (player.alive) {
-        window.socket.emit("sync", {x: player.x, y: player.y});
+        window.socket.emit("sync", {id: playerid, x: player.x, y: player.y});
     }
     
     if (cursors.left.isDown && gameStatus == "playing") {
         //  Move to the left
         move(player, "left");
-        window.socket.emit('ctrl', {action: 'move', data: "left" });
+        window.socket.emit('ctrl', {id: playerid, action: 'move', data: "left" });
     }
     else if (cursors.right.isDown && gameStatus == "playing") {
         // Move to the right
         move(player, "right");
-        window.socket.emit('ctrl', {action: 'move', data: "right" });
+        window.socket.emit('ctrl', {id: playerid, action: 'move', data: "right" });
     }
     else {
         // Stand still
@@ -239,14 +239,14 @@ function update() {
     if (cursors.up.isDown && player.body.touching.down  && gameStatus == "playing") {
         player.body.velocity.y = -350;
         game.sound.play('jump');
-        window.socket.emit('ctrl', {action: 'move', data: "jump" });
+        window.socket.emit('ctrl', {id: playerid, action: 'move', data: "jump" });
     }
 
     // fire
     if(this.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)  && gameStatus == "playing") {
         if(player.alive) {
         	p1Weapons[p1CurrentWeapon].fire(player,rocketLRDirection,rocketDirection,player.faceDirection);
-        	window.socket.emit('ctrl', {action: 'fire', data: {W: p1CurrentWeapon, LR: rocketLRDirection, Dir: rocketDirection, faceD: player.faceDirection} });
+        	window.socket.emit('ctrl', {id: playerid, action: 'fire', data: {W: p1CurrentWeapon, LR: rocketLRDirection, Dir: rocketDirection, faceD: player.faceDirection} });
         }
     }
 
@@ -282,6 +282,7 @@ function endGame() {
 	timer.stop();
 	gameStatus = "ended";
 	game.sound.play('end');
+	window.socket.emit('gg');
 }
 
 function restartGame() {
@@ -367,7 +368,7 @@ function weaponCollideOtherPlayer (otherPlayer, p1Weapons) {
 
     score += 1;
     scoreText.text = 'Your Score: ' + score;
-    window.socket.emit('info', {action: 'score' , data: score});
+    window.socket.emit('info', {id: playerid, action: 'score' , data: score});
 }
 
 function weaponCollidePlayer (player, p2Weapons) {

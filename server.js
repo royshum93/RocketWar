@@ -4,7 +4,7 @@ var express = require('express');
 var app = express();
 var path = require('path');
 var event = require("./event.js");
-
+var config = require('./config.json');
 
 module.exports = app;
 //serve static content over /session
@@ -19,8 +19,9 @@ app.get('/', function (req, res) {
 
 
 //Listening
-var server_port = process.env.PORT || 80;
-var server = app.listen(server_port);
+var server_port = config.PORT || process.env.PORT || 80;
+//var server_ip_address = process.env.IP || '127.0.0.1';
+var server = app.listen(server_port);//, server_ip_address);
 
 
 //call socket.io listen
