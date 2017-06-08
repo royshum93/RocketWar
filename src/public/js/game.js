@@ -1,3 +1,4 @@
+/*global Phaser, Weapon, playerid, timerEvent*/
 
 (function () {
 

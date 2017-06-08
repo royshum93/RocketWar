@@ -1,4 +1,4 @@
-/*global io*/
+/*global io, gameSignal, player, otherPlayer, move, p2Weapons, p1Reborn, p2Reborn, score, score2, scoreText, scoreText2*/
 
 window.socket = io.connect();
 var socket = window.socket;

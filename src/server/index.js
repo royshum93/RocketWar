@@ -4,17 +4,19 @@ var express = require('express');
 var app = express();
 var path = require('path');
 var event = require("./event.js");
-var config = require('./config.json');
+var config = require('./../../config.json');
 
 module.exports = app;
 //serve static content over /session
-app.use('/',express.static(__dirname + '/public'));
+app.use('/',express.static(__dirname + '/../public'));
+app.use('/lib/socket.io',express.static(__dirname + '/../../node_modules/socket.io-client/dist'));
+app.use('/lib/phaser',express.static(__dirname + '/../../node_modules/phaser/dist'));
 
 
 
 //Routing
 app.get('/', function (req, res) {
-   res.sendfile(path.join(__dirname + '/public/rocketwar.html'));
+   res.sendfile(path.join(__dirname + '/../public/index.html'));
 });
 
 
