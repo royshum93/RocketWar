@@ -1,4 +1,4 @@
 {
     "max_player_num" : 2,
-    "PORT": 80
+    "PORT": 3000
 }

@@ -27,3 +27,5 @@ build/Release
 node_modules
 
 .c9
+
+config.json
